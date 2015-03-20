@@ -3,15 +3,24 @@
 ## Usage example with css
 
 ``` javascript
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
+var StringReplacePlugin = require("string-replace-webpack-plugin");
 module.exports = {
 	module: {
 		loaders: [
-			{ test: /\.css$/, loader: ExtractTextPlugin.extract("style-loader", "css-loader") }
+			{ test: /index.html$/,    loader: StringReplacePlugin.replace({
+                replacements: [
+                    {
+                        pattern: /<!-- @secret (\w*?) -->/ig,
+                        replacement: function (match, p1, offset, string) {
+                            return secrets.web[p1];
+                        }
+                    }
+                ]})
+            }
 		]
 	},
 	plugins: [
-		new ExtractTextPlugin("styles.css")
+		new StringReplacePlugin()
 	]
 }
 ```

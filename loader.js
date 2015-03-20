@@ -3,7 +3,6 @@
 	Author James Andersen @jandersen78
 */
 var loaderUtils = require("loader-utils");
-var LibraryTemplatePlugin = require("webpack/lib/LibraryTemplatePlugin");
 
 module.exports = function(source) {
     var id = loaderUtils.parseQuery(this.query).id;
@@ -13,15 +12,13 @@ module.exports = function(source) {
         this.emitWarning('no replacement options found for id ' + id);
     } else {
         var options = stringReplaceOptions[id];
-        this.emitWarning(options.replacements.length + ' replacements found for id ' + id);
-        var warn = this.emitWarning;
 
         if(typeof source === "string") {
-            warn(source.substring(0, 100));
             options.replacements.forEach(function(repl) {
-                warn('pattern: ' + repl.pattern + ' replacement: ' + repl.replacement);
                 source = source.replace(repl.pattern, repl.replacement);
             });
+        } else {
+            this.emitWarning("'source' received by loader was not a string");
         }
     }
 

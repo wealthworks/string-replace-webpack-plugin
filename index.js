@@ -2,42 +2,44 @@
 	MIT License http://www.opensource.org/licenses/mit-license.php
 	Author James Andersen @jandersen78
 */
-var ConcatSource = require("webpack/lib/ConcatSource");
-var Template = require("webpack/lib/Template");
-var async = require("async");
-var SourceNode = require("source-map").SourceNode;
-var SourceMapConsumer = require("source-map").SourceMapConsumer;
 
-var nextId = 0;
 var opts = {};
 
-function StringReplacePlugin(id, filename, options) {
-	if(typeof filename !== "string") {
-		options = filename;
-		filename = id;
-		id = ++nextId;
-	}
-	if(!options) options = {};
-	this.filename = filename;
-	this.options = options;
-	this.id = id;
-}
+function StringReplacePlugin() {}
+
 module.exports = StringReplacePlugin;
 
+/**
+ * Create a loader string including replacement
+ * @param [nextLoaders]
+ * @param replaceOptions
+ * @param [prevLoaders]
+ * @returns {string}
+ */
+StringReplacePlugin.replace = function(nextLoaders, replaceOptions, prevLoaders) {
+    // shift params to account for optional nextLoaders
+    if(!prevLoaders) {
+        prevLoaders = replaceOptions;
+        replaceOptions = nextLoaders;
+        nextLoaders = undefined;
+    }
 
-StringReplacePlugin.loader = function(options) {
-    return require.resolve("./loader") + (options ? "?" + JSON.stringify(options) : "");
-};
+    if(!replaceOptions || !replaceOptions.hasOwnProperty("replacements")
+        || !Array.isArray(replaceOptions.replacements) || replaceOptions.replacements.length == 0) {
+        throw new Error("Invalid options for StringReplaceOptions.  Ensure the options objects has an array of replacements");
+    }
 
-StringReplacePlugin.extract = function(options, loader) {
     var id = Math.random().toString(36).slice(2);
-    opts[id] = options;
-    var val = [
-        require.resolve("./loader") + "?id=" + id //,
-        //loader
-    ].join("!");
+    opts[id] = replaceOptions;
+    var replaceLoader = require.resolve("./loader") + "?id=" + id,
+        val = replaceLoader;
+    if(nextLoaders || prevLoaders) {
+        var loaders = [replaceLoader];
+        if(nextLoaders) loaders.unshift(nextLoaders);
+        if(prevLoaders) loaders.push(prevLoaders);
+        val = loaders.join("!");
+    }
 
-    console.log("loader return val: " + val);
     return val;
 };
 
