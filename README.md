@@ -1,6 +1,6 @@
 # string replace plugin for webpack
 
-## Usage example with css
+## Usage example
 
 ``` javascript
 var StringReplacePlugin = require("string-replace-webpack-plugin");
