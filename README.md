@@ -1,12 +1,13 @@
-# extract text plugin for webpack
+# string replace plugin for webpack
 
-## Usage example with css
+## Usage example
 
 ``` javascript
 var StringReplacePlugin = require("string-replace-webpack-plugin");
 module.exports = {
 	module: {
 		loaders: [
+		    // configure replacements for file patterns
 			{ test: /index.html$/,    loader: StringReplacePlugin.replace({
                 replacements: [
                     {
@@ -20,58 +21,27 @@ module.exports = {
 		]
 	},
 	plugins: [
+	    // an instance of the plugin must be present
 		new StringReplacePlugin()
 	]
 }
 ```
 
-It moves every `require("style.css")` in entry chunks into a separate css output file. So your styles are no longer inlined into the javascript, but separate in a css bundle file (`styles.css`). If your total stylesheet volume is big, it will be faster because the stylesheet bundle is loaded in parallel to the javascript bundle.
-
-Advantages:
-
-* Fewer style tags (older IE has a limit)
-* CSS SourceMap (with `devtool: "sourcemap"` and `css-loader?sourceMap`)
-* CSS requested in parallel
-* CSS cached separate
-* Faster runtime (less code and DOM operations)
-
-Caveats:
-
-* Additional HTTP request
-* Longer compilation time
-* Complexer configuration
-* No runtime public path modification
-* No Hot Module Replacement
+This allows for arbitrary strings to be replaced as part of the module build process.  The original intent is to replace API
+keys in modules prior to deployment.
 
 ## API
 
 ``` javascript
-new ExtractTextPlugin([id: string], filename: string, [options])
+StringReplacePlugin([nextLoaders: string], options, [prevLoaders: string])
 ```
 
-* `id` Unique ident for this plugin instance. (For advanded usage only, by default automatic generated)
-* `filename` the filename of the result file. May contain `[name]`, `[id]` and `[contenthash]`.
-  * `[name]` the name of the chunk
-  * `[id]` the number of the chunk
-  * `[contenthash]` a hash of the content of the extracted file
+* `nextLoaders` loaders to follow the replacement
 * `options`
-  * `allChunks` extract from all additional chunks too (by default it extracts only from the initial chunk(s))
-  * `disable` disables the plugin
-
-The `ExtractTextPlugin` generates an output file per entry, so you must use `[name]`, `[id]` or `[contenthash]` when using multiple entries.
-
-``` javascript
-ExtractTextPlugin.extract([notExtractLoader], loader, [options])
-```
-
-Creates an extracting loader from a existing loader.
-
-* `notExtractLoader` (optional) the loader(s) that should be used when the css is not extracted (i. e. in a additional chunk when `allChunks: false`)
-* `loader` the loader(s) that should be used for converting the resource to a css exporting module.
-* `options`
-  * `publicPath` override the `publicPath` setting for this loader.
-
-There is also a `extract` function on the instance. You should use this if you have more than one ExtractTextPlugin.
+  * `replacements` disables the plugin
+    * `pattern` a regex to match against the file contents
+    * `replacement` an ECMAScript [string replacement function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#Specifying_a_function_as_a_parameter)
+* `prevLoaders` loaders to apply prior to the replacement
 
 ## License
 
