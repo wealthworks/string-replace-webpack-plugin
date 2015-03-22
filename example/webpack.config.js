@@ -1,7 +1,10 @@
 var webpack = require("webpack");
-var ExtractTextPlugin = require("../");
+var StringReplacePlugin = require("../");
+var secrets = require('./client_secret.json');
+
 module.exports = {
 	entry: {
+        index: "./index.html",
 		a: "./entry.js",
 		b: "./entry2.js"
 	},
@@ -13,22 +16,24 @@ module.exports = {
 	},
 	module: {
 		loaders: [
-			{ test: /\.css$/, loader: ExtractTextPlugin.extract(
-				"style-loader",
-				"css-loader?sourceMap",
-				{
-					publicPath: "../"
-				}
-			)},
-			{ test: /\.png$/, loader: "file-loader" }
+			{ test: /\.css$/, loader: "style-loader!css-loader?sourceMap"},
+			{ test: /\.png$/, loader: "file-loader" },
+            { test: /\.html$/,    loader: "file?name=[path][name].[ext]" }, // copies the files over
+            { test: /index.html$/, loader: StringReplacePlugin.replace({
+                replacements: [
+                    {
+                        pattern: /<!-- @secret (\w*?) -->/ig,
+                        replacement: function (match, p1, offset, string) {
+                            return secrets.web[p1];
+                        }
+                    }
+                ]})
+            },
 		]
 	},
 	devtool: "sourcemap",
 	plugins: [
-		new ExtractTextPlugin("css/[name].css?[hash]-[chunkhash]-[contenthash]-[name]", {
-			disable: false,
-			allChunks: true
-		}),
+		new StringReplacePlugin(),
 		new webpack.optimize.CommonsChunkPlugin("c", "c.js")
 	]
 };

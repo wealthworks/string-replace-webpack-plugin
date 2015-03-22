@@ -1,2 +1,1 @@
-require("./style2.css");
-require(["./dep2"]);
+module.exports = "something";
