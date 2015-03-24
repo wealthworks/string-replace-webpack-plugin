@@ -6,6 +6,7 @@
 var opts = {};
 
 function StringReplacePlugin() {}
+StringReplacePlugin.REPLACE_OPTIONS = '_string-replace-plugin-options';
 
 module.exports = StringReplacePlugin;
 
@@ -18,8 +19,11 @@ module.exports = StringReplacePlugin;
  */
 StringReplacePlugin.replace = function(nextLoaders, replaceOptions, prevLoaders) {
     // shift params to account for optional nextLoaders
-    if(!prevLoaders) {
+    if(!prevLoaders && (typeof replaceOptions === "String")) {
         prevLoaders = replaceOptions;
+        replaceOptions = nextLoaders;
+        nextLoaders = undefined;
+    } else if(!replaceOptions){
         replaceOptions = nextLoaders;
         nextLoaders = undefined;
     }
@@ -47,5 +51,5 @@ StringReplacePlugin.replace = function(nextLoaders, replaceOptions, prevLoaders)
 StringReplacePlugin.prototype.apply = function(compiler) {
 	// add the replacement options onto the compiler options
     // so that the loader can refer to them
-    compiler.options['_string-replace-plugin-options'] = opts;
+    compiler.options[StringReplacePlugin.REPLACE_OPTIONS] = opts;
 };
