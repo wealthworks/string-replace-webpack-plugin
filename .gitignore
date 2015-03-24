@@ -1,2 +1,6 @@
 /node_modules
 /example/assets
+
+# Ignore user-specific Webstorm files
+**/.idea/workspace.xml
+**/.idea/tasks.xml
