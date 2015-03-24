@@ -3,7 +3,7 @@
  */
 var assert = require("assert");
 var StringReplacePlugin = require("./index.js");
-var mockConfig = { options: {} };
+var mockConfig = { options: {}, emitWarning: console.log };
 
 describe('StringReplacePlugin', function(){
     describe('#replace()', function(){
@@ -45,34 +45,50 @@ describe('StringReplacePlugin', function(){
                         }
                     }]
                 });
-            console.log(loaderStr);
             assert.ok(loaderStr !== null);
             assert.ok(loaderStr.indexOf('html-loader!') === 0);
         });
     });
 
     describe('#apply()', function(){
-
-        it('should set replace options', function(){
-            var plugin = new StringReplacePlugin();
-            var replInst = {
+        var plugin = new StringReplacePlugin(),
+            loader = require("./loader.js"),
+            replInst = {
                 replacements: [{
                     pattern: /<!-- @secret (\w*?) -->/ig,
                     replacement: function (match, p1, offset, string) {
-                        return secrets.web[p1];
+                        return 'replaced ==>' + p1 + '<==';
                     }
                 }]
-            };
-            var loaderStr = StringReplacePlugin.replace('html-loader', replInst);
-            var matches = loaderStr.match(/id=(\w*)($|!)/);
-            assert.ok(matches.length === 3);
-            var id = matches[1];
+            },
+            id = null,
+            query = null;
 
+        beforeEach(function(){
+            // runs before each test in this block
+            var loaderStr = StringReplacePlugin.replace('html-loader', replInst);
+            var matches = loaderStr.match(/\?id=(\w*)(?=($|!))/);
+            assert.ok(matches.length === 3);
+            query = matches[0];
+            id = matches[1];
+        });
+
+        it('should set replace options', function(){
             plugin.apply(mockConfig);
 
             var replOpts = mockConfig.options[StringReplacePlugin.REPLACE_OPTIONS];
             assert.ok(replOpts !== null, 'replace options should be present');
             assert.ok(replOpts[id] === replInst, 'replace options should contain id from loader');
+        });
+
+        it('should replace strings in source', function(){
+            plugin.apply(mockConfig);
+            mockConfig.query = query;
+            var replaced = loader.call(mockConfig, "some string");
+            assert(replaced === "some string", "doesn't modify when there are no matches");
+
+            replaced = loader.call(mockConfig, "some <!-- @secret stuff --> string");
+            assert.equal(replaced, "some replaced ==>stuff<== string", "replaces matches");
         });
     })
 });
