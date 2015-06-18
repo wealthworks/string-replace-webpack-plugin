@@ -16,8 +16,8 @@ module.exports = function(source) {
 
         if(typeof source === "string") {
             options.replacements.forEach(function(repl) {
-                source = source.replace(repl.pattern, repl.replacement);
-            });
+                source = source.replace(repl.pattern, repl.replacement.bind(this));
+            }, this);
         } else {
             this.emitWarning("'source' received by loader was not a string");
         }
