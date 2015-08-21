@@ -19,7 +19,7 @@ module.exports = StringReplacePlugin;
  */
 StringReplacePlugin.replace = function(nextLoaders, replaceOptions, prevLoaders) {
     // shift params to account for optional nextLoaders
-    if(!prevLoaders && (typeof replaceOptions === "String")) {
+    if(!prevLoaders && (typeof replaceOptions === "string")) {
         prevLoaders = replaceOptions;
         replaceOptions = nextLoaders;
         nextLoaders = undefined;
