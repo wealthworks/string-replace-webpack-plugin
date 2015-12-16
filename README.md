@@ -20,11 +20,12 @@ module.exports = {
                     }
                 ]})
             }
-      ]},
-      plugins: [
-         // an instance of the plugin must be present
-         new StringReplacePlugin()
       ]
+   },
+   plugins: [
+      // an instance of the plugin must be present
+      new StringReplacePlugin()
+   ]
 }
 ```
 
