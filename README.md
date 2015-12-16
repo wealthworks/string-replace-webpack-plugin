@@ -5,10 +5,12 @@
 ``` javascript
 var StringReplacePlugin = require("string-replace-webpack-plugin");
 module.exports = {
-	module: {
-		loaders: [
-		    // configure replacements for file patterns
-			{ test: /index.html$/,    loader: StringReplacePlugin.replace({
+   module: {
+      loaders: [
+         // configure replacements for file patterns
+         { 
+            test: /index.html$/,
+            loader: StringReplacePlugin.replace({
                 replacements: [
                     {
                         pattern: /<!-- @secret (\w*?) -->/ig,
@@ -18,12 +20,11 @@ module.exports = {
                     }
                 ]})
             }
-		]
-	},
-	plugins: [
-	    // an instance of the plugin must be present
-		new StringReplacePlugin()
-	]
+      ]},
+      plugins: [
+         // an instance of the plugin must be present
+         new StringReplacePlugin()
+      ]
 }
 ```
 
