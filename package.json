@@ -1,6 +1,6 @@
 {
   "name": "string-replace-webpack-plugin",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "James Andersen @jandersen78",
   "description": "Replace string tokens in the contents of a file.",
   "peerDependencies": {
