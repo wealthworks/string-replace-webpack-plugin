@@ -5,7 +5,8 @@
 var loaderUtils = require("loader-utils");
 var StringReplacePlugin = require('./index.js');
 
-module.exports = function(source) {
+module.exports = function(source, map) {
+    var callback = this.async();
     var id = loaderUtils.parseQuery(this.query).id;
 
     var stringReplaceOptions = this.options[StringReplacePlugin.REPLACE_OPTIONS];
@@ -23,6 +24,6 @@ module.exports = function(source) {
         }
     }
 
-	this.cacheable && this.cacheable();
-	return source;
+    this.cacheable && this.cacheable();
+    callback(null, source, map);
 };
